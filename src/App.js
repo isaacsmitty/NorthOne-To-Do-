@@ -1,29 +1,37 @@
 import React, { Component } from "react";
 import { generateRandomId } from "./utils";
 import tasks from "./tasks.json";
-import getTasks from "./task-svc.js";
+// import getTasks from "./task-svc.js";
 
-class Loading extends Component {
+// class Loading extends Component {
+//   render() {
+//     return (
+//       <tr>
+//         <td colspan="2">Loading Tasks...</td>
+//       </tr>
+//     );
+//   }
+// }
+
+class TodoListItem extends Component {
+  // const onClick = event => {
+  // deleteTask(task.taskName);
+  // }
   render() {
-    return (
-      <tr>
-        <td colspan="2">Loading Tasks...</td>
-      </tr>
-    );
-  }
-}
-
-function TodoListItem({ task }) {
   return (
     <tr>
-      <td>{task.taskName}</td>
-      <td>{task.taskDisc}</td>
-      <td>{task.dueDate}</td>
+      <td>{this.props.task.taskName}</td>
+      <td><small>{this.props.task.taskDisc}</small></td>
+      <td><small>{this.props.task.dueDate}</small></td>
       <td>
-        <input type="checkbox" defaultChecked={task.finished} />
+        <input type="checkbox" defaultChecked={this.props.task.finished} />
+      </td>
+      <td>
+      <div onClick={this.props.deleteTask}><small>Remove</small></div>
       </td>
     </tr>
   );
+}
 }
 
 function NewTaskForm({ addTask }) {
@@ -41,18 +49,25 @@ function NewTaskForm({ addTask }) {
   return (
     <form onSubmit={onSubmit}>
       <input type="text" name="taskName" placeholder=" Task Name" />
-      <input type="text" name="taskDisc" placeholder=" Discription" />
+      <input type="text" name="taskDisc" placeholder=" Description" />
       <input type="text" name="dueDate" placeholder=" Due Date" />
-      <button type="submit">Add</button>
+      <button type="submit">To Do</button>
     </form>
   );
 }
+// function deleteTask (taskId) {
+//   console.log('delete');
+//  const oldTasks = tasks;
+//  const newTasks = oldTasks.filter(task.id => task.id !== taskId);
+//  this.setState({ tasks: newTasks });
+// }
 export default class TodoList extends Component {
   constructor(props) {
     super();
     this.state = { tasks };
 
     this.addTask = this.addTask.bind(this);
+    this.deleteTask = this.deleteTask.bind(this);
   }
   addTask = (taskName, taskDisc, dueDate) => {
     const newTask = {
@@ -60,15 +75,32 @@ export default class TodoList extends Component {
       taskDisc,
       dueDate,
       finished: false,
-      id: generateRandomId()
+      id: generateRandomId(),
     };
     // console.log(newTask);
     this.setState({ tasks: [...this.state.tasks, newTask] });
+  }
+  
+ deleteTask = (taskId) => {
+    console.log('delete');
+    console.log(taskId);
+    // const newTasks = this.state.tasks.splice(this.state.tasks.indexOf(taskId), 1);
+    const oldTasks = this.state.tasks;
+    console.log(oldTasks);
+    const newTasks = oldTasks.filter(function (tasks) {
+          return tasks.id !== taskId
+    });
+    console.log(newTasks);
+    this.setState({ tasks: newTasks });
   };
+
 
   render() {
     const taskItems = this.state.tasks.map(task => (
-      <TodoListItem key={task.id} task={task} />
+    <TodoListItem key={task.id} task={task}
+      deleteTask={() => this.deleteTask(task.id)}
+      />
+      // console.log(task.id)
     ));
     return (
       <div className="container">
@@ -81,7 +113,7 @@ export default class TodoList extends Component {
           <thead>
             <tr>
               <td>Task</td>
-              <td>Discription</td>
+              <td>Description</td>
               <td>Due Date</td>
               <td>Done?</td>
             </tr>
