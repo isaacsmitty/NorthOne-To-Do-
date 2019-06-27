@@ -1,38 +1,64 @@
 import React, { Component } from "react";
 import { generateRandomId } from "./utils";
-// import tasks from "./tasks.json";
-// import getTasks from "./task-svc.js";
+import { throwStatement } from "@babel/types";
 
-// class Loading extends Component {
-//   render() {
-//     return (
-//       <tr>
-//         <td colspan="2">Loading Tasks...</td>
-//       </tr>
-//     );
-//   }
-// }
 
-class TodoListItem extends Component {
-  render() {
+
+function TodoListItem(props) {
+  return (
+    <tr>
+      <td>{props.task.taskName}</td>
+      <td><small>{props.task.taskDisc}</small></td>
+      <td><small>{props.task.dueDate}</small></td>
+      <td><small>{props.task.dueTime}</small></td>
+      <td>
+        <input type="checkbox" defaultChecked={props.task.finished} />
+      </td>
+      <td>
+        <div onClick={props.deleteTask}><small>Remove</small></div>
+      </td>
+      <td>
+        <div onClick={props.editTask}><small>Edit</small></div>
+      </td>
+    </tr>
+  );
+} 
+
+
+function Edit (props) {
+  // if (props.isEditing) {
+    const onSubmit = event => {
+      event.preventDefault();
+      const taskInput = event.target.elements.taskName;
+      const taskDisc = event.target.elements.taskDisc;
+      const dueDate = event.target.elements.dueDate;
+      const dueTime = event.target.elements.dueTime;
+      
+      props.addTask(taskInput.value, taskDisc.value, dueDate.value, dueTime.value);
+      taskInput.value = "";
+      taskDisc.value = "";
+      dueDate.value = "";
+      dueTime.value = "";
+          
+    };
+    if (props.isEditing) {
     return (
-      <tr>
-        <td>{this.props.task.taskName}</td>
-        <td><small>{this.props.task.taskDisc}</small></td>
-        <td><small>{this.props.task.dueDate}</small></td>
-        <td><small>{this.props.task.dueTime}</small></td>
-        <td>
-          <input type="checkbox" defaultChecked={this.props.task.finished} />
-        </td>
-        <td>
-        <div onClick={this.props.deleteTask}><small>Remove</small></div>
-        </td>
-      </tr>
+      <form onSubmit={onSubmit}>
+        <input type="text" name="taskName" value={props.editData.edit.taskName} />
+        <input type="text" name="taskDisc" value={props.editData.edit.taskDisc} />
+        <input type="date" name="dueDate" value={props.editData.edit.dueDate} />
+        <input type="time" name="dueTime" value={props.editData.edit.dueTime} />
+        <button type="submit"> Edit </button>
+      </form>
     );
+  } else {
+    return (
+      <div></div>
+    )
   }
 }
 
-function NewTaskForm({ addTask }) {
+function NewTaskForm(props) {
   const onSubmit = event => {
     event.preventDefault();
     const taskInput = event.target.elements.taskName;
@@ -40,12 +66,14 @@ function NewTaskForm({ addTask }) {
     const dueDate = event.target.elements.dueDate;
     const dueTime = event.target.elements.dueTime;
     
-    addTask(taskInput.value, taskDisc.value, dueDate.value, dueTime.value);
+    props.addTask(taskInput.value, taskDisc.value, dueDate.value, dueTime.value);
     taskInput.value = "";
     taskDisc.value = "";
     dueDate.value = "";
     dueTime.value = "";
+        
   };
+  if (!props.isEditing) {
   return (
     <form onSubmit={onSubmit}>
       <input type="text" name="taskName" placeholder=" Task Name" />
@@ -55,18 +83,26 @@ function NewTaskForm({ addTask }) {
       <button type="submit">To Do</button>
     </form>
   );
+  } else {
+    return (
+      <div></div>
+    )
+  }
 }
 
 export default class TodoList extends Component {
   constructor(props) {
-    super();
+    super(props);
     this.state = { 
       tasks: [],
       loading: true,
+      isEditing: false,
+      edit: {},
      };
   
     this.addTask = this.addTask.bind(this);
     this.deleteTask = this.deleteTask.bind(this);
+    this.editTask = this.editTask.bind(this);
   }
 
   componentDidMount() {
@@ -118,14 +154,25 @@ export default class TodoList extends Component {
     this.setState({ tasks: newTasks });  
   };
 
+  editTask = (index) => {
+    this.setState({
+      isEditing: true,
+      edit: this.state.tasks[index],
+    })
+  }
 
   render() {
+    // if (this.state.isEditing){
+    //   return <Edit editTask={this.state.edit.task} isEditing={this.state.isEditing} 
+    //   loading={this.state.loading }/>
+    // }
     if (this.state.loading) {
       return <h1>Loading Tasks...</h1>;
     }
-    const taskItems = this.state.tasks.map(task => (
+    const taskItems = this.state.tasks.map((task, index) => (
     <TodoListItem key={task.id} task={task}
       deleteTask={() => this.deleteTask(task.id)}
+      editTask={() => this.editTask(index)}
       />
       // console.log(task.id)
     ));
@@ -133,7 +180,6 @@ export default class TodoList extends Component {
       <div className="container">
         <h1>
           Get It Done! <br />
-          {/* <small>For the truly industrious</small> */}
         </h1>
 
         <table>
@@ -150,8 +196,14 @@ export default class TodoList extends Component {
         </table>
 
         <hr />
-        <NewTaskForm addTask={this.addTask} />
+
+        <NewTaskForm addTask={this.addTask} isEditing={this.state.isEditing} />
+        <Edit editData={this.state} isEditing={this.state.isEditing} 
+              addTask={this.addTask}/>
+        
       </div>
     );
+
   }
+  
 }
