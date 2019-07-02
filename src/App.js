@@ -86,19 +86,20 @@ export default class TodoList extends Component {
                  tasks,
                  isEditing: false,
               });
-              // fetch("https://todo-json.herokuapp.com/tasks", {
-              //   method: 'PATCH',
-              //   body: JSON.stringify({
-              //    tasks
-                 
-              //   })
-              // }).then((response) => {
-              //   response.json().then((response) => {
-              //     console.log(response);
-              //   })
-              // }).catch(err => {
-              //   console.error(err)
-              // })
+          
+              return fetch("https://todo-json.herokuapp.com/tasks" + "/" + taskId, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(
+                 this.state.tasks[index]
+                 )
+              }).then((res) => {
+                res.json().then((res) => {
+                  console.log(res);
+                })
+              }).catch(err => {
+                console.error(err)
+              })
   }
 
   render() {

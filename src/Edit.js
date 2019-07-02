@@ -40,8 +40,6 @@ export class Edit extends Component {
       return (
         <form onSubmit={this.onSubmit}>
         {/* {console.log(this.state)} */}
-        {console.log(this.props.editData.taskName)}
-        {console.log(this.state)}
           <input type="text" name="taskName" value={this.state.taskName} 
             onChange={this.handleChange}/>
           <input type="text" name="taskDisc" value={this.state.taskDisc} 
