@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import { generateRandomId } from "./utils";
-import { axios } from 'axios';
-
 
 function TodoListItem(props) {
   return (
