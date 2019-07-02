@@ -1,129 +1,8 @@
 import React, { Component } from "react";
 import { generateRandomId } from "./utils";
-
-function TodoListItem(props) {
-  return (
-    <tr>
-      <td>{props.task.taskName}</td>
-      <td><small>{props.task.taskDisc}</small></td>
-      <td><small>{props.task.dueDate}</small></td>
-      <td><small>{props.task.dueTime}</small></td>
-      <td>
-        <input type="checkbox" defaultChecked={props.task.finished} />
-      </td>
-      <td>
-        <div onClick={props.deleteTask}><small>Remove</small></div>
-      </td>
-      <td>
-        <div onClick={props.editTask}><small>Edit</small></div>
-      </td>
-    </tr>
-  );
-} 
-
-
-class Edit extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      // edit: this.props.editData
-      taskName: "",
-      taskDisc: "",
-      dueDate: "",
-      dueTime: "",
-    };
-    this.handleChange = this.handleChange.bind(this);
-    // this.componentDidUpdate = this.componentDidUpdate.bind(this);
-}
-    onSubmit = event => {
-      event.preventDefault();
-      const taskName = event.target.elements.taskName;
-      const taskDisc = event.target.elements.taskDisc;
-      const dueDate = event.target.elements.dueDate;
-      const dueTime = event.target.elements.dueTime;
-      const taskId = this.props.editData.id;
-
-      // this.setState = {}
-     
-      this.props.updateTask(taskId, taskName.value, taskDisc.value, dueDate.value, dueTime.value);
-
-      // taskName.value = "";
-      // taskDisc.value = "";
-      // dueDate.value = "";
-      // dueTime.value = "";
-       
-    };
-    handleChange(event) {
-      this.setState({[event.target.name]: event.target.value});
-    }
-
-  
-    componentWillReceiveProps(nextProps){
-      if (nextProps.editData.taskName !== this.state.taskName) {
-        this.setState({ 
-          taskName: nextProps.editData.taskName,
-          taskDisc: nextProps.editData.taskDisc,
-          dueDate: nextProps.editData.dueDate,
-          dueTime: nextProps.editData.dueTime,
-         });
-      }
-    }  
-  render(){
-    if (this.props.isEditing) {
-    return (
-      <form onSubmit={this.onSubmit}>
-      {/* {console.log(this.editData)} */}
-      {console.log(this.props.editData.taskName)}
-      {console.log(this.state)}
-        <input type="text" name="taskName" value={this.state.taskName} 
-          onChange={this.handleChange}/>
-        <input type="text" name="taskDisc" value={this.state.taskDisc} 
-          onChange={this.handleChange}/>
-        <input type="date" name="dueDate" value={this.state.dueDate} 
-          onChange={this.handleChange}/>
-        <input type="time" name="dueTime" value={this.state.dueTime} 
-          onChange={this.handleChange}/>
-        <button type="submit"> Edit </button>
-      </form>
-    );
-  } else {
-    return (
-      null
-    )
-  }
-}
-}
-function NewTaskForm(props) {
-  const onSubmit = event => {
-    event.preventDefault();
-    const taskInput = event.target.elements.taskName;
-    const taskDisc = event.target.elements.taskDisc;
-    const dueDate = event.target.elements.dueDate;
-    const dueTime = event.target.elements.dueTime;
-    
-    props.addTask(taskInput.value, taskDisc.value, dueDate.value, dueTime.value);
-    taskInput.value = "";
-    taskDisc.value = "";
-    dueDate.value = "";
-    dueTime.value = "";
-        
-  };
-  if (!props.isEditing) {
-  return (
-    <form onSubmit={onSubmit}>
-      <input type="text" name="taskName" placeholder=" Task Name" />
-      <input type="text" name="taskDisc" placeholder=" Description" />
-      <input type="date" name="dueDate" placeholder=" Due Date" />
-      <input type="time" name="dueTime" placeholder=" Due Time" />
-      <button type="submit">To Do</button>
-    </form>
-  );
-  } else {
-    return (
-      <div></div>
-    )
-  }
-}
+import { TodoListItem } from "./ToDoListItem"
+import { NewTaskForm } from "./NewTaskForm"
+import { Edit } from "./Edit"
 
 export default class TodoList extends Component {
   constructor(props) {
@@ -167,7 +46,6 @@ export default class TodoList extends Component {
       body: JSON.stringify(newTask)
     })
       .then(res => res.json())
-  
     // console.log(newTask); 
   }
   
@@ -208,25 +86,22 @@ export default class TodoList extends Component {
                  tasks,
                  isEditing: false,
               });
-              fetch("https://todo-json.herokuapp.com/tasks", {
-                method: 'PATCH',
-                body: JSON.stringify({
-                 tasks
-                })
-              }).then((response) => {
-                response.json().then((response) => {
-                  console.log(response);
-                })
-              }).catch(err => {
-                console.error(err)
-              })
+              // fetch("https://todo-json.herokuapp.com/tasks", {
+              //   method: 'PATCH',
+              //   body: JSON.stringify({
+              //    tasks
+                 
+              //   })
+              // }).then((response) => {
+              //   response.json().then((response) => {
+              //     console.log(response);
+              //   })
+              // }).catch(err => {
+              //   console.error(err)
+              // })
   }
 
   render() {
-    // if (this.state.isEditing){
-    //   return <Edit editTask={this.state.edit.task} isEditing={this.state.isEditing} 
-    //   loading={this.state.loading }/>
-    // }
     if (this.state.loading) {
       return <h1>Loading Tasks...</h1>;
     }
@@ -260,12 +135,8 @@ export default class TodoList extends Component {
 
         <NewTaskForm addTask={this.addTask} isEditing={this.state.isEditing} />
         <Edit editData={this.state.edit} isEditing={this.state.isEditing} 
-              updateTask={this.updateTask} />
-              {/* // handleChange={this.handleChange} /> */}
-        
+              updateTask={this.updateTask} />      
       </div>
     );
-
-  }
-  
+  } 
 }
