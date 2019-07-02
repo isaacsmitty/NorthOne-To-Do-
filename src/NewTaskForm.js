@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 
 export function NewTaskForm(props) {
     const onSubmit = event => {

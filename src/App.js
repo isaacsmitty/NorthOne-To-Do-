@@ -87,7 +87,7 @@ export default class TodoList extends Component {
                  isEditing: false,
               });
           
-              return fetch("https://todo-json.herokuapp.com/tasks" + "/" + taskId, {
+              return fetch("https://todo-json.herokuapp.com/tasks/" + taskId, {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(
